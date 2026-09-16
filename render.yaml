@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: codeshot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn code_shot.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.11"
+
+  - type: postgresql
+    name: codeshot-db
+    plan: free
+    ipAllowList: []

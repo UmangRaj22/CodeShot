@@ -1,0 +1,111 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Create polished, shareable images from your code.">
+    <title>CodeShot</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<main class="app-shell">
+    <header class="topbar">
+        <a class="brand" href="{% url 'home' %}" aria-label="CodeShot home">
+            <span class="brand-mark">{ }</span>
+            <span>CodeShot</span>
+        </a>
+        <div class="topbar-note"><span class="status-dot"></span> Ready to create</div>
+    </header>
+
+    <section class="intro">
+        <div>
+            <p class="eyebrow">Code image studio</p>
+            <h1>Make your code<br><em>worth sharing.</em></h1>
+        </div>
+        <p class="intro-copy">Turn snippets into crisp, beautiful visuals for your docs, posts, and presentations.</p>
+    </section>
+
+    <div class="workspace">
+        <section class="panel editor-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="section-kicker">01 / Write</p>
+                    <h2>Your snippet</h2>
+                </div>
+                <span class="shortcut">⌘ ↵</span>
+            </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="editor-wrap">
+                <div class="editor-toolbar">
+                    <span class="traffic-light red"></span><span class="traffic-light yellow"></span><span class="traffic-light green"></span>
+                    <span class="file-name">snippet.py</span>
+                    <span class="language-badge">PY</span>
+                </div>
+                <textarea id="code-input" name="code" spellcheck="false" placeholder="Paste your code here...">def hello_world():
+    print("Welcome to CodeShot")</textarea>
+                <div class="editor-footer"><span>UTF-8</span><span id="char-count">0 characters</span></div>
+            </div>
+
+            <div class="control-grid">
+                <label class="field"><span>Language</span><select name="lang"><option value="python">Python</option><option value="javascript">JavaScript</option><option value="java">Java</option><option value="typescript">TypeScript</option><option value="html">HTML</option><option value="css">CSS</option><option value="go">Go</option><option value="rust">Rust</option></select></label>
+                <label class="field"><span>Theme</span><select name="theme">
+                    <option value="dracula">Dracula</option>
+                    <option value="monokai">Monokai</option>
+                    <option value="github-dark">GitHub Dark</option>
+                    <option value="one-dark">One Dark</option>
+                    <option value="nord">Nord</option>
+                    <option value="solarized-dark">Solarized Dark</option>
+                    <option value="solarized-light">Solarized Light</option>
+                    <option value="gruvbox-dark">Gruvbox Dark</option>
+                    <option value="gruvbox-light">Gruvbox Light</option>
+                    <option value="native">Native</option>
+                    <option value="friendly">Friendly</option>
+                    <option value="bw">Black & White</option>
+                    <option value="pastie">Pastie</option>
+                    <option value="vim">Vim</option>
+                </select></label>
+            </div>
+
+            <div class="options-heading"><span>Display options</span><span class="muted">Customize your frame</span></div>
+            <div class="toggle-list">
+                <label class="toggle"><span><strong>Line numbers</strong><small>Keep your code easy to follow</small></span><input type="checkbox" name="line_numbers" checked><i></i></label>
+                <label class="toggle"><span><strong>Window controls</strong><small>Add the familiar desktop frame</small></span><input type="checkbox" name="mac_buttons" checked><i></i></label>
+            </div>
+
+            <div class="button-row">
+                <button type="submit" class="primary-btn"><span>Generate image</span><b>→</b></button>
+                <button type="submit" name="export_png" value="1" class="secondary-btn"><span>Export PNG</span><b>↓</b></button>
+            </div>
+        </form>
+        </section>
+
+        <section class="panel preview-panel">
+            <div class="panel-heading preview-heading">
+                <div><p class="section-kicker">02 / Preview</p><h2>Your canvas</h2></div>
+                {% if image %}<span class="live-label"><span class="status-dot"></span> Live</span>{% endif %}
+            </div>
+            <div class="preview-stage">
+        {% if image %}
+            <img src="{{ image }}" alt="Generated code preview">
+        {% else %}
+            <div class="empty-preview"><div class="empty-icon">✦</div><h3>Your preview lives here</h3><p>Write a snippet, tune the details, and generate your image.</p></div>
+        {% endif %}
+            </div>
+            <div class="preview-footer"><span>PNG · High resolution</span><span>Made for sharing</span></div>
+        </section>
+    </div>
+
+    <footer class="footer"><span>CodeShot</span><span>Write. Snap. Share.</span></footer>
+</main>
+<script>
+    const codeInput = document.getElementById('code-input');
+    const charCount = document.getElementById('char-count');
+    const updateCount = () => { charCount.textContent = `${codeInput.value.length} characters`; };
+    codeInput.addEventListener('input', updateCount);
+    updateCount();
+</script>
+
+</body>
+</html>
