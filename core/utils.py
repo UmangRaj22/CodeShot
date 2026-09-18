@@ -3,9 +3,10 @@ import io
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
-
+from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+FONT_PATH = Path(__file__).resolve().parent / "fonts" / "DejaVuSansMono.ttf"
 
 # =========================================================
 # HIGH RESOLUTION RENDERING
@@ -265,6 +266,7 @@ def create_code_image(
 
         # 10px final → 40px rendering
         "line_pad": 10 * SCALE,
+        "font_name": str(FONT_PATH),
     }
 
     if font_name:
