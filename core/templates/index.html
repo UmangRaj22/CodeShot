@@ -1,17 +1,66 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="google-site-verification" content="59spIXh9loCi3NREi1ZFcTr8VqVUWl0v5-AETZsQzRQ" />
+
+    <!-- Google Search Console Verification -->
+    <meta name="google-site-verification"
+          content="59spIXh9loCi3NREi1ZFcTr8VqVUWl0v5-AETZsQzRQ">
+
+    <!-- Primary SEO -->
+    <title>CodeShot – Free Code to Image Generator</title>
 
     <meta name="description"
-          content="Create polished, shareable images from your code.">
+          content="Create beautiful code screenshots for free with CodeShot. Convert code into high-quality images with syntax highlighting, multiple themes, line numbers and customizable options.">
 
-    <title>CodeShot</title>
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="CodeShot">
 
+    <link rel="canonical"
+          href="https://codeshotstudio.vercel.app/">
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CodeShot">
+    <meta property="og:title"
+          content="CodeShot – Free Code to Image Generator">
+    <meta property="og:description"
+          content="Turn your code into beautiful, syntax-highlighted images. Customize themes and download high-quality code screenshots for free.">
+    <meta property="og:url"
+          content="https://codeshotstudio.vercel.app/">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title"
+          content="CodeShot – Free Code to Image Generator">
+    <meta name="twitter:description"
+          content="Create beautiful code screenshots with syntax highlighting, themes and customizable options.">
+
+    <!-- Structured Data: WebApplication -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "CodeShot",
+        "url": "https://codeshotstudio.vercel.app/",
+        "description": "A free online code-to-image generator with syntax highlighting, customizable themes and high-quality PNG exports.",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR"
+        }
+    }
+    </script>
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
 </head>
 
 <body>
@@ -47,8 +96,10 @@
         </div>
 
         <p class="intro-copy">
-            Turn snippets into crisp, beautiful visuals for your docs,
-            posts, and presentations.
+            CodeShot is a free code-to-image generator that transforms
+            your code snippets into beautiful, syntax-highlighted visuals.
+            Choose your favorite theme, customize your code screenshots,
+            and download them in seconds.
         </p>
 
     </section>
@@ -272,7 +323,7 @@
                 {% if image %}
                     <img
                         src="{{ image }}"
-                        alt="Generated code preview"
+                        alt="Generated code screenshot created with CodeShot"
                     >
                 {% else %}
                     <div class="empty-preview">
