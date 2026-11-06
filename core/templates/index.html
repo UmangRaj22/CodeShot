@@ -106,7 +106,7 @@
 
 
     <!-- Workspace -->
-    <div class="workspace">
+    <div class="workspace" id="generator">
 
         <!-- Editor Panel -->
         <section class="panel editor-panel">
@@ -172,11 +172,28 @@
                             <option value="python">Python</option>
                             <option value="javascript">JavaScript</option>
                             <option value="java">Java</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="php">PHP</option>
+                            <option value="swift">Swift</option>
+                            <option value="kotlin">Kotlin</option>
                             <option value="typescript">TypeScript</option>
                             <option value="html">HTML</option>
                             <option value="css">CSS</option>
                             <option value="go">Go</option>
+                            <option value="bash">Bash</option>
                             <option value="rust">Rust</option>
+                            <option value="dart">Dart</option>
+                            <option value="scala">Scala</option>
+                            <option value="perl">Perl</option>
+                            <option value="lua">Lua</option>
+                            <option value="objective-c">Objective-C</option>
+                            <option value="sql">SQL</option>
+                            <option value="json">JSON</option>
+                            <option value="yaml">YAML</option>
+                            <option value="markdown">Markdown</option>
 
                         </select>
 
@@ -211,6 +228,26 @@
                             <option value="bw">Black &amp; White</option>
                             <option value="pastie">Pastie</option>
                             <option value="vim">Vim</option>
+                            <option value="material">Material</option>
+                            <option value="xcode">Xcode</option>
+                            <option value="vs">Visual Studio</option>
+                            <option value="zenburn">Zenburn</option>
+                            <option value="tango">Tango</option>
+                            <option value="autumn">Autumn</option>
+                            <option value="arduino">Arduino</option>
+                            <option value="coffee">Coffee</option>
+                            <option value="colorful">Colorful</option>
+                            <option value="fruity">Fruity</option>
+                            <option value="emacs">Emacs</option>
+                            <option value="manni">Manni</option>
+                            <option value="murphy">Murphy</option>
+                            <option value="paraiso-dark">Paraiso Dark</option>
+                            <option value="paraiso-light">Paraiso Light</option>
+                            <option value="lovelace">Lovelace</option>
+                            <option value="trac">Trac</option>
+                            <option value="borland">Borland</option>
+                            <option value="inkpot">Inkpot</option>
+                            <option value="default">Default</option>
 
                         </select>
 
@@ -347,13 +384,120 @@
     </div>
 
 
+    <!-- About CodeShot -->
+    <section class="info-section" aria-labelledby="features-title">
+
+        <div class="info-heading">
+            <p class="eyebrow">The details</p>
+            <h2 id="features-title">Everything you need to make code shareable.</h2>
+        </div>
+
+        <div class="feature-grid">
+
+            <article class="info-card">
+                <span class="info-number">01</span>
+                <h3>Multiple languages</h3>
+                <p>Highlight code in Python, JavaScript, Java, TypeScript, HTML, CSS, Go, and Rust.</p>
+            </article>
+
+            <article class="info-card">
+                <span class="info-number">02</span>
+                <h3>Themes to match</h3>
+                <p>Choose from a collection of dark and light themes to give your snippet the right look.</p>
+            </article>
+
+            <article class="info-card">
+                <span class="info-number">03</span>
+                <h3>Line numbers</h3>
+                <p>Include line numbers to make code easier to follow, reference, and discuss.</p>
+            </article>
+
+            <article class="info-card">
+                <span class="info-number">04</span>
+                <h3>High-resolution export</h3>
+                <p>Download a crisp PNG, ready for sharing in docs, presentations, and posts.</p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <section class="info-section how-to-section" aria-labelledby="how-to-title">
+
+        <div class="info-heading">
+            <p class="eyebrow">A simple workflow</p>
+            <h2 id="how-to-title">From code to shareable in three steps.</h2>
+        </div>
+
+        <ol class="steps-list">
+            <li>
+                <span class="step-number">1</span>
+                <div>
+                    <h3>Code paste</h3>
+                    <p>Paste your snippet into the editor.</p>
+                </div>
+            </li>
+            <li>
+                <span class="step-number">2</span>
+                <div>
+                    <h3>Customize</h3>
+                    <p>Pick a language and theme, then set your display options.</p>
+                </div>
+            </li>
+            <li>
+                <span class="step-number">3</span>
+                <div>
+                    <h3>Download</h3>
+                    <p>Export your finished code image as a high-resolution PNG.</p>
+                </div>
+            </li>
+        </ol>
+
+    </section>
+
+
+    <section class="info-section faq-section" aria-labelledby="faq-title">
+
+        <div class="info-heading">
+            <p class="eyebrow">Good to know</p>
+            <h2 id="faq-title">Frequently asked questions.</h2>
+        </div>
+
+        <div class="faq-list">
+            <details class="faq-item">
+                <summary>Is CodeShot free?</summary>
+                <p>Yes. CodeShot is free to use for creating and downloading code images.</p>
+            </details>
+            <details class="faq-item">
+                <summary>Which programming languages are supported?</summary>
+                <p>CodeShot supports Python, JavaScript, Java, TypeScript, HTML, CSS, Go, and Rust.</p>
+            </details>
+        </div>
+
+    </section>
+
+
     <!-- Footer -->
     <footer class="footer">
+        <div class="footer-brand">
+            <a class="brand" href="/" aria-label="CodeShot home">
+                <span class="brand-mark">{ }</span>
+                <span>CodeShot</span>
+            </a>
+            <p>Turn code snippets into images worth sharing.</p>
+        </div>
 
-        <span>CodeShot</span>
+        <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="#generator">Create</a>
+            <a href="#features-title">Features</a>
+            <a href="#how-to-title">How to use</a>
+            <a href="#faq-title">FAQ</a>
+        </nav>
 
-        <span>Write. Snap. Share.</span>
-
+        <span class="footer-copyright">
+            &copy; {% now "Y" %} CodeShot
+        </span>
     </footer>
 
 </main>

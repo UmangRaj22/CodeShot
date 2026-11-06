@@ -19,11 +19,28 @@ CodeShot is a web-based tool that turns code snippets into clean, polished PNG i
 - Python
 - JavaScript
 - Java
+- C
+- C++
+- C#
+- Ruby
+- PHP
+- Swift
+- Kotlin
 - TypeScript
 - HTML
 - CSS
 - Go
+- Bash
 - Rust
+- Dart
+- Scala
+- Perl
+- Lua
+- Objective-C
+- SQL
+- JSON
+- YAML
+- Markdown
 
 ## Available Themes
 
@@ -41,6 +58,26 @@ CodeShot is a web-based tool that turns code snippets into clean, polished PNG i
 - Black & White
 - Pastie
 - Vim
+- Material
+- Xcode
+- Visual Studio
+- Zenburn
+- Tango
+- Autumn
+- Arduino
+- Coffee
+- Colorful
+- Fruity
+- Emacs
+- Manni
+- Murphy
+- Paraiso Dark
+- Paraiso Light
+- Lovelace
+- Trac
+- Borland
+- Inkpot
+- Default
 
 ## Tech Stack
 

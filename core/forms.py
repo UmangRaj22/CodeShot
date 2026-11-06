@@ -18,24 +18,30 @@ FONT_CHOICES = [
 
 LANG_CHOICES = [
     ('python', 'Python'),
-    ('javascript', 'JavaScript'),   
+    ('javascript', 'JavaScript'),
     ('java', 'Java'),
+    ('c', 'C'),
     ('csharp', 'C#'),
     ('cpp', 'C++'),
     ('ruby', 'Ruby'),
-    ('go', 'Go'),
     ('php', 'PHP'),
     ('swift', 'Swift'),
     ('kotlin', 'Kotlin'),
     ('typescript', 'TypeScript'),
     ('html', 'HTML'),
     ('css', 'CSS'),
+    ('go', 'Go'),
     ('bash', 'Bash'),
     ('rust', 'Rust'),
     ('dart', 'Dart'),
     ('scala', 'Scala'),
     ('perl', 'Perl'),
     ('lua', 'Lua'),
+    ('objective-c', 'Objective-C'),
+    ('sql', 'SQL'),
+    ('json', 'JSON'),
+    ('yaml', 'YAML'),
+    ('markdown', 'Markdown'),
 ]
 
 class CodeForm(forms.Form):

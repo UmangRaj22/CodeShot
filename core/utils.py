@@ -3,6 +3,7 @@ import io
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
 from pygments.formatters import ImageFormatter
+from pygments.styles import get_style_by_name
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -47,6 +48,10 @@ def _mix_colors(color_a, color_b, weight):
         )
         for i in range(3)
     )
+
+
+def _rgb_to_hex(color):
+    return "#{:02x}{:02x}{:02x}".format(*color)
 
 
 # =========================================================
@@ -156,10 +161,21 @@ def _theme_palette(theme_name):
         },
     }
 
-    return palette.get(
-        (theme_name or "dracula").lower(),
-        palette["dracula"]
-    )
+    theme_key = (theme_name or "dracula").lower()
+    if theme_key in palette:
+        return palette[theme_key]
+
+    style_background = get_style_by_name(theme_key).background_color or "#282a36"
+    return {
+        "background": _rgb_to_hex(
+            _mix_colors(style_background, "#ffffff", 0.2)
+        ),
+        "background_top": _rgb_to_hex(
+            _mix_colors(style_background, "#000000", 0.2)
+        ),
+        "code": style_background,
+        "accent": "#d9f85b",
+    }
 
 
 # =========================================================
