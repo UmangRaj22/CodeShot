@@ -123,7 +123,7 @@
             </div>
 
 
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
 
                 {% csrf_token %}
 
@@ -147,6 +147,7 @@
                         id="code-input"
                         name="code"
                         spellcheck="false"
+                        rows="1"
                         placeholder="Paste your code here..."
                     >def hello_world():
     print("Welcome to CodeShot")</textarea>
@@ -307,6 +308,170 @@
 
                 </div>
 
+                <details class="customize-section">
+                    <summary class="customize-summary">
+                        <span id="backdrop-heading">Backdrop</span>
+                        <small>Choose a canvas background</small>
+                    </summary>
+                    <div class="customize-content">
+
+                    <label class="field">
+                        <span>Background type</span>
+                        <select name="backdrop_type" id="backdrop-type">
+                            <option value="wallpaper" {% if values.backdrop_type == "wallpaper" %}selected{% endif %}>macOS wallpapers (19)</option>
+                            <option value="gradient" {% if values.backdrop_type != "wallpaper" and values.backdrop_type != "solid" and values.backdrop_type != "image" %}selected{% endif %}>Gradients (92)</option>
+                            <option value="solid" {% if values.backdrop_type == "solid" %}selected{% endif %}>Solid color</option>
+                            <option value="image" {% if values.backdrop_type == "image" %}selected{% endif %}>Your image</option>
+                        </select>
+                    </label>
+
+                    <label class="field backdrop-choice" data-backdrop="wallpaper">
+                        <span>Wallpaper</span>
+                        <select name="wallpaper_index">
+                            {% for index, label in wallpaper_choices %}
+                                <option value="{{ index }}" {% if values.wallpaper_index == index|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label class="field backdrop-choice" data-backdrop="gradient">
+                        <span>Gradient</span>
+                        <select name="gradient_index">
+                            {% for index, label in gradient_choices %}
+                                <option value="{{ index }}" {% if values.gradient_index == index|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label class="field color-choice backdrop-choice" data-backdrop="solid">
+                        <span>Background color</span>
+                        <input type="color" name="background_color" value="{{ values.background_color|default:'#4536a3' }}">
+                    </label>
+
+                    <label class="field backdrop-choice" data-backdrop="image">
+                        <span>Choose image</span>
+                        <input type="file" name="backdrop_image" accept="image/png,image/jpeg,image/webp,image/gif">
+                        <small class="field-help">PNG, JPEG, WebP or GIF · up to 8 MB</small>
+                    </label>
+                    </div>
+                </details>
+
+                <details class="customize-section">
+                    <summary class="customize-summary">
+                        <span id="frame-heading">Frame &amp; export</span>
+                        <small>Fine-tune the image</small>
+                    </summary>
+                    <div class="customize-content">
+
+                    <div class="control-grid">
+                        <label class="field">
+                            <span>Aspect ratio</span>
+                            <select name="aspect_ratio">
+                                <option value="original" {% if values.aspect_ratio == "original" %}selected{% endif %}>Original</option>
+                                <option value="1:1" {% if values.aspect_ratio == "1:1" %}selected{% endif %}>1:1</option>
+                                <option value="4:3" {% if values.aspect_ratio == "4:3" %}selected{% endif %}>4:3</option>
+                                <option value="3:2" {% if values.aspect_ratio == "3:2" %}selected{% endif %}>3:2</option>
+                                <option value="16:9" {% if values.aspect_ratio == "16:9" or not values.aspect_ratio %}selected{% endif %}>16:9</option>
+                                <option value="9:16" {% if values.aspect_ratio == "9:16" %}selected{% endif %}>9:16</option>
+                                <option value="2:3" {% if values.aspect_ratio == "2:3" %}selected{% endif %}>2:3</option>
+                                <option value="3:4" {% if values.aspect_ratio == "3:4" %}selected{% endif %}>3:4</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>Export scale</span>
+                            <select name="export_scale">
+                                <option value="1" {% if values.export_scale == "1" or not values.export_scale %}selected{% endif %}>1×</option>
+                                <option value="2" {% if values.export_scale == "2" %}selected{% endif %}>2×</option>
+                                <option value="3" {% if values.export_scale == "3" %}selected{% endif %}>3×</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>Font</span>
+                            <select name="font">
+                                <option {% if values.font == "Consolas" or not values.font %}selected{% endif %}>Consolas</option>
+                                <option {% if values.font == "Courier New" %}selected{% endif %}>Courier New</option>
+                                <option {% if values.font == "Monospace" %}selected{% endif %}>Monospace</option>
+                                <option {% if values.font == "Fira Code" %}selected{% endif %}>Fira Code</option>
+                                <option {% if values.font == "Source Code Pro" %}selected{% endif %}>Source Code Pro</option>
+                                <option {% if values.font == "Ubuntu Mono" %}selected{% endif %}>Ubuntu Mono</option>
+                                <option {% if values.font == "Inconsolata" %}selected{% endif %}>Inconsolata</option>
+                                <option {% if values.font == "JetBrains Mono" %}selected{% endif %}>JetBrains Mono</option>
+                                <option {% if values.font == "Menlo" %}selected{% endif %}>Menlo</option>
+                                <option {% if values.font == "Monaco" %}selected{% endif %}>Monaco</option>
+                            </select>
+                        </label>
+
+                        <label class="field">
+                            <span>Font size</span>
+                            <input type="number" name="font_size" min="10" max="36" value="{{ values.font_size|default:'16' }}">
+                        </label>
+                    </div>
+
+                    <label class="toggle compact-toggle">
+                        <span>
+                            <strong>Auto-adjust width</strong>
+                            <small>Fit the frame to the code</small>
+                        </span>
+                        <input type="checkbox" name="auto_adjust_width" {% if not values or values.auto_adjust_width == "on" %}checked{% endif %}>
+                        <i></i>
+                    </label>
+
+                    <div class="control-grid dimension-grid">
+                        <label class="field">
+                            <span>Minimum margin · vertical</span>
+                            <input type="number" name="margin_vertical" min="0" max="240" value="{{ values.margin_vertical|default:'24' }}">
+                        </label>
+                        <label class="field">
+                            <span>Minimum margin · horizontal</span>
+                            <input type="number" name="margin_horizontal" min="0" max="240" value="{{ values.margin_horizontal|default:'24' }}">
+                        </label>
+                        <label class="field">
+                            <span>Padding · vertical</span>
+                            <input type="number" name="padding_vertical" min="0" max="160" value="{{ values.padding_vertical|default:'24' }}">
+                        </label>
+                        <label class="field">
+                            <span>Padding · horizontal</span>
+                            <input type="number" name="padding_horizontal" min="0" max="160" value="{{ values.padding_horizontal|default:'32' }}">
+                        </label>
+                    </div>
+
+                    <label class="toggle compact-toggle">
+                        <span>
+                            <strong>Drop shadow</strong>
+                            <small>Adjust the shadow behind the window</small>
+                        </span>
+                        <input type="checkbox" name="drop_shadow" {% if not values or values.drop_shadow == "on" %}checked{% endif %}>
+                        <i></i>
+                    </label>
+
+                    <div class="control-grid dimension-grid">
+                        <label class="field"><span>Shadow · X</span><input type="number" name="shadow_x" min="-100" max="100" value="{{ values.shadow_x|default:'0' }}"></label>
+                        <label class="field"><span>Shadow · Y</span><input type="number" name="shadow_y" min="-100" max="100" value="{{ values.shadow_y|default:'12' }}"></label>
+                        <label class="field"><span>Shadow · blur</span><input type="number" name="shadow_blur" min="0" max="100" value="{{ values.shadow_blur|default:'24' }}"></label>
+                        <label class="field"><span>Shadow · spread</span><input type="number" name="shadow_spread" min="-40" max="100" value="{{ values.shadow_spread|default:'0' }}"></label>
+                        <label class="field"><span>Corner radius</span><input type="number" name="corner_radius" min="0" max="64" value="{{ values.corner_radius|default:'16' }}"></label>
+                    </div>
+
+                    <label class="toggle compact-toggle">
+                        <span>
+                            <strong>Window title</strong>
+                            <small>Show a title in the top bar</small>
+                        </span>
+                        <input type="checkbox" name="show_title" {% if values.show_title == "on" %}checked{% endif %}>
+                        <i></i>
+                    </label>
+                    <label class="field">
+                        <span>Title text</span>
+                        <input type="text" name="window_title" maxlength="100" value="{{ values.window_title|default:'Untitled' }}">
+                    </label>
+                    </div>
+                </details>
+
+                {% if error %}
+                    <p class="form-error" role="alert">{{ error }}</p>
+                {% endif %}
 
                 <!-- Buttons -->
                 <div class="button-row">
@@ -359,23 +524,30 @@
 
                 {% if image %}
                     <img
+                        id="generated-image"
                         src="{{ image }}"
                         alt="Generated code screenshot created with CodeShot"
                     >
                 {% else %}
-                    <div class="empty-preview">
+                    <img
+                        id="generated-image"
+                        alt="Generated code screenshot created with CodeShot"
+                        hidden
+                    >
+                    <div class="empty-preview" id="empty-preview">
                         <p>Your generated image will appear here.</p>
                     </div>
                 {% endif %}
 
             </div>
 
+            <p class="preview-error" id="preview-error" role="alert" hidden></p>
 
             <div class="preview-footer">
 
                 <span>PNG · High resolution</span>
 
-                <span>Made for sharing</span>
+                <button type="button" class="copy-image-btn" id="copy-image" {% if not image %}disabled{% endif %}>Copy image</button>
 
             </div>
 
@@ -552,15 +724,98 @@
 
     const codeInput = document.getElementById('code-input');
     const charCount = document.getElementById('char-count');
+    const form = codeInput.form;
+    const generatedImage = document.getElementById('generated-image');
+    const emptyPreview = document.getElementById('empty-preview');
+    const previewError = document.getElementById('preview-error');
 
     const updateCount = () => {
         charCount.textContent =
             `${codeInput.value.length} characters`;
     };
 
-    codeInput.addEventListener('input', updateCount);
+    const resizeCodeInput = () => {
+        codeInput.style.height = 'auto';
+        const height = Math.min(codeInput.scrollHeight, 420);
+        codeInput.style.height = `${height}px`;
+        codeInput.style.overflowY = codeInput.scrollHeight > 420 ? 'auto' : 'hidden';
+    };
 
+    let previewTimer;
+    let activePreview;
+    const updatePreview = async () => {
+        if (activePreview) activePreview.abort();
+        activePreview = new AbortController();
+        const request = activePreview;
+        previewError.hidden = true;
+        try {
+            const response = await fetch(form.action || window.location.href, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: request.signal
+            });
+            const result = await response.json();
+            if (request !== activePreview) return;
+            if (!response.ok) throw new Error(result.error || 'Could not update the preview.');
+            generatedImage.src = result.image;
+            generatedImage.hidden = false;
+            if (emptyPreview) emptyPreview.hidden = true;
+        } catch (error) {
+            if (error.name === 'AbortError' || request !== activePreview) return;
+            previewError.textContent = error.message || 'Could not update the preview.';
+            previewError.hidden = false;
+        }
+    };
+    const schedulePreview = () => {
+        window.clearTimeout(previewTimer);
+        previewTimer = window.setTimeout(updatePreview, 300);
+    };
+
+    codeInput.addEventListener('input', () => {
+        updateCount();
+        resizeCodeInput();
+        schedulePreview();
+    });
+    form.addEventListener('input', schedulePreview);
+    form.addEventListener('change', schedulePreview);
+    form.addEventListener('submit', (event) => {
+        if (event.submitter && event.submitter.name === 'export_png') return;
+        event.preventDefault();
+        window.clearTimeout(previewTimer);
+        updatePreview();
+    });
+    resizeCodeInput();
     updateCount();
+    updatePreview();
+
+    const backdropType = document.getElementById('backdrop-type');
+    const updateBackdropFields = () => {
+        document.querySelectorAll('.backdrop-choice').forEach((field) => {
+            field.hidden = field.dataset.backdrop !== backdropType.value;
+        });
+    };
+    backdropType.addEventListener('change', updateBackdropFields);
+    updateBackdropFields();
+
+    const copyButton = document.getElementById('copy-image');
+    if (!navigator.clipboard || !window.ClipboardItem) {
+        copyButton.disabled = true;
+        copyButton.title = 'Image copying is not supported in this browser.';
+    }
+    copyButton.addEventListener('click', async () => {
+        const generatedImage = document.getElementById('generated-image');
+        if (!generatedImage || copyButton.disabled) return;
+        try {
+            const blob = await fetch(generatedImage.src).then((response) => response.blob());
+            await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+            copyButton.textContent = 'Copied!';
+            window.setTimeout(() => { copyButton.textContent = 'Copy image'; }, 1800);
+        } catch (error) {
+            copyButton.textContent = 'Copy failed';
+            window.setTimeout(() => { copyButton.textContent = 'Copy image'; }, 1800);
+        }
+    });
 
 </script>
 

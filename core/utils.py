@@ -1,4 +1,5 @@
 import io
+import math
 
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name, guess_lexer
@@ -14,6 +15,36 @@ FONT_PATH = Path(__file__).resolve().parent / "fonts" / "DejaVuSansMono.ttf"
 # =========================================================
 
 SCALE = 4
+
+GRADIENT_PAIRS = (
+    ("#4f46e5", "#06b6d4"), ("#7c3aed", "#ec4899"),
+    ("#2563eb", "#a855f7"), ("#0f766e", "#22c55e"),
+    ("#ea580c", "#facc15"), ("#be123c", "#fb7185"),
+    ("#0f172a", "#475569"), ("#1d4ed8", "#38bdf8"),
+    ("#6d28d9", "#c084fc"), ("#047857", "#a3e635"),
+    ("#c2410c", "#fb923c"), ("#9f1239", "#f472b6"),
+    ("#164e63", "#2dd4bf"), ("#312e81", "#818cf8"),
+    ("#713f12", "#fbbf24"), ("#365314", "#bef264"),
+    ("#831843", "#f9a8d4"), ("#1e3a8a", "#60a5fa"),
+    ("#581c87", "#d8b4fe"), ("#134e4a", "#5eead4"),
+    ("#7f1d1d", "#fca5a5"), ("#1f2937", "#9ca3af"),
+    ("#4338ca", "#f0abfc"),
+)
+
+WALLPAPER_PAIRS = (
+    ("#0b1c2c", "#086788"), ("#071a35", "#6941c6"),
+    ("#172554", "#db2777"), ("#102a43", "#2dd4bf"),
+    ("#312e81", "#f97316"), ("#3b0764", "#e11d48"),
+    ("#052e16", "#65a30d"), ("#111827", "#2563eb"),
+    ("#431407", "#f59e0b"), ("#164e63", "#a855f7"),
+    ("#1e1b4b", "#06b6d4"), ("#500724", "#fb7185"),
+    ("#082f49", "#38bdf8"), ("#365314", "#facc15"),
+    ("#292524", "#c2410c"), ("#172554", "#4f46e5"),
+    ("#0f172a", "#14b8a6"), ("#3f1d2e", "#fb923c"),
+    ("#202124", "#8b5cf6"),
+)
+
+GRADIENT_DIRECTIONS = (0, 90, 45, 135)
 
 
 # =========================================================
@@ -223,8 +254,12 @@ def create_code_image(
     bg_gradient,
     padding,
     watermark,
-    watermark_text
+    watermark_text,
+    options=None
 ):
+    options = options or {}
+    scale_multiplier = max(1, min(3, int(options.get("export_scale", 1))))
+    SCALE = 4 * scale_multiplier
 
     # -----------------------------------------------------
     # DEFAULT CODE
@@ -271,17 +306,18 @@ def create_code_image(
     # Everything is rendered at 4× resolution.
     # -----------------------------------------------------
 
+    font_size = max(10, min(36, int(options.get("font_size", 16))))
     formatter_kwargs = {
         "style": theme or "dracula",
 
         # We draw line numbers ourselves.
         "line_numbers": False,
 
-        # 24px final → 96px rendering
-        "font_size": 24 * SCALE,
+        # Render the code at 4× for a crisp final image.
+        "font_size": font_size * SCALE,
 
-        # 10px final → 40px rendering
-        "line_pad": 10 * SCALE,
+        # Compact line spacing keeps tall snippets manageable.
+        "line_pad": 6 * SCALE,
         "font_name": str(FONT_PATH),
     }
 
@@ -326,7 +362,7 @@ def create_code_image(
         gutter_width = 70 * SCALE
 
         number_font = _load_font(
-            20 * SCALE
+            max(9, int(font_size * 0.8)) * SCALE
         )
 
     else:
@@ -341,12 +377,12 @@ def create_code_image(
     code_area_width = (
         code_img.width
         + gutter_width
-        + 20 * SCALE
+        + 12 * SCALE
     )
 
     code_area_height = (
         code_img.height
-        + 20 * SCALE
+        + 12 * SCALE
     )
 
     code_area = Image.new(
@@ -357,6 +393,17 @@ def create_code_image(
         ),
         _hex_to_rgb(code_background) + (255,)
     )
+    if not options.get("auto_adjust_width", True):
+        fixed_width = max(code_area_width, 720 * SCALE)
+        if fixed_width > code_area_width:
+            fixed_area = Image.new(
+                "RGBA",
+                (fixed_width, code_area_height),
+                _hex_to_rgb(code_background) + (255,),
+            )
+            fixed_area.alpha_composite(code_area)
+            code_area = fixed_area
+            code_area_width = fixed_width
 
     code_draw = ImageDraw.Draw(
         code_area
@@ -370,10 +417,7 @@ def create_code_image(
 
         # ImageFormatter spacing:
         # font_size + 2 × line_pad
-        line_height = (
-            (24 + 20)
-            * SCALE
-        )
+        line_height = (font_size + 12) * SCALE
 
         number_color = (
             105,
@@ -402,7 +446,7 @@ def create_code_image(
             )
 
             number_y = (
-                10 * SCALE
+                6 * SCALE
                 + index * line_height
             )
 
@@ -425,7 +469,7 @@ def create_code_image(
         (
             gutter_width
             + 8 * SCALE,
-            10 * SCALE
+            6 * SCALE
         )
     )
 
@@ -433,36 +477,61 @@ def create_code_image(
     # LAYOUT
     # -----------------------------------------------------
 
-    pad = max(
-        28,
-        int(padding or 28)
+    pad_x = max(0, min(160, int(options.get("padding_horizontal", padding or 32))))
+    pad_y = max(0, min(160, int(options.get("padding_vertical", padding or 24))))
+    margin_x = max(0, min(240, int(options.get("margin_horizontal", 24))))
+    margin_y = max(0, min(240, int(options.get("margin_vertical", 24))))
+    shadow_extent_x = (
+        abs(max(-100, min(100, int(options.get("shadow_x", 0)))))
+        + max(0, min(100, int(options.get("shadow_blur", 24))))
+        + max(0, min(100, int(options.get("shadow_spread", 0))))
+        + 8
     )
-
-    outer_margin = 48
+    shadow_extent_y = (
+        abs(max(-100, min(100, int(options.get("shadow_y", 12)))))
+        + max(0, min(100, int(options.get("shadow_blur", 24))))
+        + max(0, min(100, int(options.get("shadow_spread", 0))))
+        + 8
+    ) if options.get("drop_shadow", True) else 0
 
     # Top space for Mac buttons
     header_height = 48
 
     window_width = (
         code_area.width
-        + pad * 2 * SCALE
+        + pad_x * 2 * SCALE
     )
 
     window_height = (
         code_area.height
         + header_height * SCALE
-        + pad * SCALE
+        + pad_y * 2 * SCALE
     )
 
     canvas_width = (
         window_width
-        + outer_margin * 2 * SCALE
+        + (margin_x + shadow_extent_x) * 2 * SCALE
     )
 
     canvas_height = (
         window_height
-        + outer_margin * 2 * SCALE
+        + (margin_y + shadow_extent_y) * 2 * SCALE
     )
+
+    aspect_ratio = options.get("aspect_ratio", "original")
+    ratios = {
+        "1:1": (1, 1), "4:3": (4, 3), "3:2": (3, 2),
+        "16:9": (16, 9), "9:16": (9, 16), "2:3": (2, 3),
+        "3:4": (3, 4),
+    }
+    if aspect_ratio in ratios:
+        ratio_width, ratio_height = ratios[aspect_ratio]
+        ratio_unit = max(
+            math.ceil(canvas_width / (ratio_width * SCALE)),
+            math.ceil(canvas_height / (ratio_height * SCALE)),
+        )
+        canvas_width = ratio_unit * ratio_width * SCALE
+        canvas_height = ratio_unit * ratio_height * SCALE
 
     # -----------------------------------------------------
     # MAIN CANVAS
@@ -490,63 +559,51 @@ def create_code_image(
         (0, 0, 0, 255)
     )
 
-    bg_draw = ImageDraw.Draw(
-        background
-    )
-
-    start = _hex_to_rgb(
-        outer_top
-    )
-
-    end = _hex_to_rgb(
-        outer_background
-    )
-
-    for y in range(canvas_height):
-
-        ratio = (
-            y
-            / max(
-                canvas_height - 1,
-                1
+    backdrop_type = options.get("backdrop_type", "gradient")
+    gradient_index = max(0, min(91, int(options.get("gradient_index", 0))))
+    wallpaper_index = max(0, min(18, int(options.get("wallpaper_index", 0))))
+    if backdrop_type == "solid":
+        background_color = _hex_to_rgb(options.get("background_color", outer_background))
+        background = Image.new("RGBA", (canvas_width, canvas_height), background_color + (255,))
+    elif backdrop_type == "image" and options.get("backdrop_image"):
+        with Image.open(io.BytesIO(options["backdrop_image"])) as backdrop:
+            backdrop = backdrop.convert("RGBA")
+            fit_ratio = max(canvas_width / backdrop.width, canvas_height / backdrop.height)
+            resized = backdrop.resize(
+                (math.ceil(backdrop.width * fit_ratio), math.ceil(backdrop.height * fit_ratio)),
+                Image.Resampling.LANCZOS,
             )
-        )
+            left = (resized.width - canvas_width) // 2
+            top = (resized.height - canvas_height) // 2
+            resized = resized.crop((left, top, left + canvas_width, top + canvas_height))
+            base_color = _hex_to_rgb(options.get("background_color", outer_background))
+            base = Image.new("RGBA", (canvas_width, canvas_height), base_color + (255,))
+            background = Image.alpha_composite(base, resized)
+    else:
+        if backdrop_type == "wallpaper":
+            start_hex, end_hex = WALLPAPER_PAIRS[wallpaper_index]
+            angle = 45
+        elif backdrop_type == "gradient":
+            start_hex, end_hex = GRADIENT_PAIRS[gradient_index % len(GRADIENT_PAIRS)]
+            angle = GRADIENT_DIRECTIONS[gradient_index // len(GRADIENT_PAIRS)]
+        else:
+            start_hex, end_hex = outer_top, outer_background
+            angle = 0
 
-        r = int(
-            start[0] * (1 - ratio)
-            + end[0] * ratio
-        )
-
-        g = int(
-            start[1] * (1 - ratio)
-            + end[1] * ratio
-        )
-
-        b = int(
-            start[2] * (1 - ratio)
-            + end[2] * ratio
-        )
-
-        bg_draw.line(
-            (
-                0,
-                y,
-                canvas_width,
-                y
-            ),
-            fill=(
-                r,
-                g,
-                b,
-                255
+        start = Image.new("RGBA", (canvas_width, canvas_height), _hex_to_rgb(start_hex) + (255,))
+        end = Image.new("RGBA", (canvas_width, canvas_height), _hex_to_rgb(end_hex) + (255,))
+        mask = Image.linear_gradient("L").resize((canvas_width, canvas_height))
+        if angle:
+            mask = mask.rotate(angle, resample=Image.Resampling.BICUBIC).resize(
+                (canvas_width, canvas_height)
             )
-        )
+        background = Image.composite(end, start, mask)
 
     # -----------------------------------------------------
     # OPTIONAL GLOW
     # -----------------------------------------------------
 
-    if bg_gradient:
+    if bg_gradient and backdrop_type not in ("solid", "image"):
 
         glow_layer = Image.new(
             "RGBA",
@@ -613,48 +670,38 @@ def create_code_image(
     # SHADOW
     # -----------------------------------------------------
 
+    shadow_enabled = options.get("drop_shadow", True)
+    shadow_x = max(-100, min(100, int(options.get("shadow_x", 0)))) * SCALE
+    shadow_y = max(-100, min(100, int(options.get("shadow_y", 12)))) * SCALE
+    shadow_blur = max(0, min(100, int(options.get("shadow_blur", 24)))) * SCALE
+    shadow_spread = max(-40, min(100, int(options.get("shadow_spread", 0)))) * SCALE
+    shadow_padding = shadow_blur + abs(shadow_x) + abs(shadow_y) + abs(shadow_spread) + 8 * SCALE
     shadow = Image.new(
         "RGBA",
-        (
-            window_width + 40 * SCALE,
-            window_height + 40 * SCALE
-        ),
+        (window_width + shadow_padding * 2, window_height + shadow_padding * 2),
         (0, 0, 0, 0)
     )
-
-    shadow_draw = ImageDraw.Draw(
-        shadow
-    )
-
-    shadow_draw.rounded_rectangle(
-        (
-            15 * SCALE,
-            15 * SCALE,
-            window_width + 15 * SCALE,
-            window_height + 15 * SCALE
-        ),
-        radius=18 * SCALE,
-        fill=(
-            0,
-            0,
-            0,
-            115
+    shadow_draw = ImageDraw.Draw(shadow)
+    if shadow_enabled:
+        shadow_draw.rounded_rectangle(
+            (
+                shadow_padding - shadow_spread,
+                shadow_padding - shadow_spread,
+                shadow_padding + window_width + shadow_spread,
+                shadow_padding + window_height + shadow_spread
+            ),
+            radius=max(0, 16 * SCALE + shadow_spread),
+            fill=(0, 0, 0, 115)
         )
-    )
-
-    shadow = shadow.filter(
-        ImageFilter.GaussianBlur(
-            15 * SCALE
+        if shadow_blur:
+            shadow = shadow.filter(ImageFilter.GaussianBlur(shadow_blur))
+        canvas.alpha_composite(
+            shadow,
+            (
+                window_x + shadow_x - shadow_padding,
+                window_y + shadow_y - shadow_padding
+            )
         )
-    )
-
-    canvas.alpha_composite(
-        shadow,
-        (
-            window_x - 20 * SCALE,
-            window_y + 15 * SCALE
-        )
-    )
 
     # -----------------------------------------------------
     # MAIN CODE WINDOW
@@ -677,6 +724,7 @@ def create_code_image(
     # SINGLE DARK CODE CARD
     # -----------------------------------------------------
 
+    corner_radius = max(0, min(64, int(options.get("corner_radius", 16)))) * SCALE
     window_draw.rounded_rectangle(
         (
             0,
@@ -684,7 +732,7 @@ def create_code_image(
             window_width - 1,
             window_height - 1
         ),
-        radius=16 * SCALE,
+        radius=corner_radius,
         fill=_hex_to_rgb(
             code_background
         ) + (255,)
@@ -732,6 +780,17 @@ def create_code_image(
                 fill=color
             )
 
+    if options.get("show_title", False):
+        title = str(options.get("window_title", "Untitled"))[:100]
+        title_font = _load_font(13 * SCALE)
+        title_width = window_draw.textbbox((0, 0), title, font=title_font)[2]
+        window_draw.text(
+            ((window_width - title_width) // 2, 15 * SCALE),
+            title,
+            fill=(220, 220, 220, 210),
+            font=title_font,
+        )
+
     # -----------------------------------------------------
     # CODE CONTENT
     # -----------------------------------------------------
@@ -739,7 +798,7 @@ def create_code_image(
     window.alpha_composite(
         code_area,
         (
-            pad * SCALE,
+            pad_x * SCALE,
             header_height * SCALE
         )
     )
@@ -755,7 +814,7 @@ def create_code_image(
             window_width - 1,
             window_height - 1
         ),
-        radius=16 * SCALE,
+        radius=corner_radius,
         outline=(
             255,
             255,
